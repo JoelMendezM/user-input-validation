@@ -1,17 +1,30 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Button from "../UI/Button";
 import Card from "../UI/Card";
 import ErrorModal from "../UI/ErrorModal";
 import classes from "./AddUser.module.css";
 
 const AddUser = (props) => {
-  const [enteredUsername, setEnteredUsername] = useState("");
-  const [enteredAge, setEnteredAge] = useState("");
+  /*
+  WHEN TO USE USEREF:
+  When you just want to quickly read a value (for example), if you only
+  need to read a value and you never plan on changing anything, then you
+  don't need state because just to use state as a keylogger is not that great,
+  refs will propably better to use.
+  In this scenario it's up to you which one to use. Both are fine in this case.
+  Refs will allow you write less code, but state will be a bit more cleaner.*/
+
+  const nameInputRef = useRef();
+  const ageInputRef = useRef();
+
   const [error, setError] = useState();
 
   const addUserHandler = (e) => {
     e.preventDefault();
-    if (enteredUsername.trim().length === 0 || enteredAge.trim().length === 0) {
+    const enteredName = nameInputRef.current.value;
+    const enteredUserAge = ageInputRef.current.value;
+
+    if (enteredName.trim().length === 0 || enteredUserAge.trim().length === 0) {
       setError({
         title: "Invalid input",
         message: "Please enter a valid name and age (non-empty values).",
@@ -19,7 +32,7 @@ const AddUser = (props) => {
       return;
     }
     //Adding "+" in front of the variable transform it into a number
-    if (+enteredAge < 0) {
+    if (+enteredUserAge < 0) {
       setError({
         title: "Invalid input",
         message: "Please enter a valid age (> 0).",
@@ -27,18 +40,11 @@ const AddUser = (props) => {
       return;
     }
 
-    props.onAddUser(enteredUsername, enteredAge);
-    setEnteredUsername("");
-    setEnteredAge("");
+    props.onAddUser(enteredName, enteredUserAge);
+    nameInputRef.current.value;
+    ageInputRef.current.value;
   };
 
-  const usernameChangeHandler = (e) => {
-    setEnteredUsername(e.target.value);
-  };
-
-  const ageChangeHandler = (e) => {
-    setEnteredAge(e.target.value);
-  };
   const errorHandler = () => {
     setError(null);
   };
@@ -55,19 +61,9 @@ const AddUser = (props) => {
       <Card className={classes.input}>
         <form onSubmit={addUserHandler}>
           <label htmlFor="username">User Name</label>
-          <input
-            id="username"
-            type="text"
-            value={enteredUsername}
-            onChange={usernameChangeHandler}
-          />
+          <input id="username" type="text" ref={nameInputRef} />
           <label htmlFor="userage">Age (Years)</label>
-          <input
-            id="userage"
-            type="number"
-            value={enteredAge}
-            onChange={ageChangeHandler}
-          />
+          <input id="userage" type="number" ref={ageInputRef} />
           <Button type="submit">Add User</Button>
         </form>
       </Card>
